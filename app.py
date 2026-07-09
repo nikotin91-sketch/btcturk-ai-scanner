@@ -91,28 +91,9 @@ def firsatlar():
 
             skor = 40
 
- # Teknik analiz testi
-try:
-    mum = get_klines(
-        coin["pair"].replace("/", ""),
-        resolution=1,
-        candle_count=100
-    )
 
-    if mum:
-        fiyatlar = mum["close"]
-
-        rsi_deger = rsi(fiyatlar)
-
-        ema9 = ema(fiyatlar, 9)
-        ema21 = ema(fiyatlar, 21)
-
-except Exception:
-    pass
-
-
-if degisim >= 2:
-    skor += 10
+            if degisim >= 2:
+                skor += 10
 
             if degisim >= 5:
                 skor += 20
