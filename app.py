@@ -3,9 +3,36 @@ from flask_cors import CORS
 import requests
 from datetime import datetime
 import pytz
+import os
 
 app = Flask(__name__)
 CORS(app)
+
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+
+def telegram_gonder(mesaj):
+
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+
+    try:
+        requests.post(
+            url,
+            json={
+                "chat_id": TELEGRAM_CHAT_ID,
+                "text": mesaj
+            },
+            timeout=10
+        )
+
+    except:
+        pass
+
 
 
 @app.route("/app")
@@ -13,9 +40,11 @@ def uygulama():
     return send_file("index.html")
 
 
+
 @app.route("/")
 def home():
     return "BTCTurk AI Scanner Aktif"
+
 
 
 @app.route("/firsatlar")
@@ -24,15 +53,20 @@ def firsatlar():
     url = "https://api.btcturk.com/api/v2/ticker"
 
     try:
-        veri = requests.get(url, timeout=10).json()
+        veri = requests.get(
+            url,
+            timeout=10
+        ).json()
+
     except:
+
         return jsonify({
-            "saat": "",
-            "coinler": []
+            "saat":"",
+            "coinler":[]
         })
 
 
-    liste = []
+    liste=[]
 
 
     for coin in veri.get("data", []):
@@ -53,15 +87,13 @@ def firsatlar():
             skor = 40
 
 
-            # Fiyat hareketi
-            if degisim >= 3:
-                skor += 15
+            if degisim >= 2:
+                skor += 10
 
             if degisim >= 5:
-                skor += 15
+                skor += 20
 
 
-            # Hacim gücü
             if hacim >= 5:
                 skor += 10
 
@@ -71,55 +103,72 @@ def firsatlar():
 
 
             if skor >= 80:
+
                 sinyal = "🟢 GÜÇLÜ AL"
 
-            elif skor >= 65:
-                sinyal = "🟡 TAKİP"
+
+                telegram_gonder(
+                    f"🚀 BTCTürk AI Sinyal\n\n"
+                    f"Coin: {isim}\n"
+                    f"Fiyat: {fiyat} TL\n"
+                    f"Değişim: %{degisim}\n"
+                    f"Hacim: {hacim}\n"
+                    f"AI Skor: {skor}"
+                )
+
+
+            elif skor >= 60:
+
+                sinyal="🟡 TAKİP"
+
 
             else:
-                sinyal = "⚪ BEKLE"
+
+                sinyal="⚪ BEKLE"
 
 
 
-            if skor >= 65:
+            if skor >= 60:
 
                 liste.append({
 
-                    "coin": isim,
-                    "fiyat": fiyat,
-                    "degisim": round(degisimi, 2) if False else round(degisism,2),
-                    "hacim": round(hacim,2),
-                    "ai": skor,
-                    "sinyal": sinyal
+                    "coin":isim,
+                    "fiyat":fiyat,
+                    "degisim":round(degisim,2),
+                    "hacim":round(hacim,2),
+                    "ai":skor,
+                    "sinyal":sinyal
 
                 })
 
 
         except:
-            pass
+
+            continue
 
 
 
     liste.sort(
-        key=lambda x: x["ai"],
+        key=lambda x:x["ai"],
         reverse=True
     )
 
 
-    saat = datetime.now(
+    saat=datetime.now(
         pytz.timezone("Europe/Istanbul")
     ).strftime("%H:%M:%S")
 
 
     return jsonify({
 
-        "saat": saat,
-        "coinler": liste[:20]
+        "saat":saat,
+        "coinler":liste[:20]
 
     })
 
 
-if __name__ == "__main__":
+
+if __name__=="__main__":
 
     app.run(
         host="0.0.0.0",
