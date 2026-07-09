@@ -1,9 +1,14 @@
 from flask import Flask, jsonify, send_file
 from flask_cors import CORS
-import requests
 from datetime import datetime
 import pytz
-import os
+
+from btcturk_api import get_try_pairs, get_klines
+from indicators import ema, rsi
+from analyzer import calculate_score
+from notifier import send_telegram
+from cache import can_send
+from config import NOTIFICATION_COOLDOWN
 
 app = Flask(__name__)
 CORS(app)
@@ -86,9 +91,28 @@ def firsatlar():
 
             skor = 40
 
+ # Teknik analiz testi
+try:
+    mum = get_klines(
+        coin["pair"].replace("/", ""),
+        resolution=1,
+        candle_count=100
+    )
 
-            if degisim >= 2:
-                skor += 10
+    if mum:
+        fiyatlar = mum["close"]
+
+        rsi_deger = rsi(fiyatlar)
+
+        ema9 = ema(fiyatlar, 9)
+        ema21 = ema(fiyatlar, 21)
+
+except Exception:
+    pass
+
+
+if degisim >= 2:
+    skor += 10
 
             if degisim >= 5:
                 skor += 20
