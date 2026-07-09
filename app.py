@@ -46,23 +46,30 @@ def home():
 def test_api():
 
     from btcturk_api import get_klines
+    from indicators import ema, rsi
 
     try:
         data = get_klines(
             "BTCTRY",
             resolution=1,
-            candle_count=50
+            candle_count=100
         )
 
+        prices = data["close"]
+
+        ema9 = ema(prices, 9)
+        ema21 = ema(prices, 21)
+
         return jsonify({
-            "durum": "ok",
-            "veri": data
+            "fiyat": prices[-1],
+            "rsi": rsi(prices),
+            "ema9": ema9[-1],
+            "ema21": ema21[-1]
         })
 
     except Exception as e:
         return jsonify({
-            "durum": "hata",
-            "mesaj": str(e)
+            "hata": str(e)
         })
 
 
