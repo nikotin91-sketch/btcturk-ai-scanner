@@ -1,9 +1,15 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file
 from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route("/app")
+def uygulama():
+    return send_file("index.html")
+
 
 @app.route("/")
 def home():
@@ -23,15 +29,38 @@ def firsatlar():
         try:
             isim = coin["pairNormalized"]
 
-            if isim.endswith("_TRY"):
+            if not isim.endswith("_TRY"):
+                continue
 
+            fiyat = float(coin["last"])
+            degisim = float(coin["dailyPercent"])
+            hacim = float(coin["volume"])
+
+            skor = 50
+
+            if degisim >= 5:
+                skor += 20
+
+            if hacim > 10:
+                skor += 20
+
+            durum = "🟢 AL" if skor >= 70 else "🟡 TAKİP"
+
+            if skor >= 70:
                 liste.append({
                     "coin": isim,
-                    "fiyat": coin["last"],
-                    "degisim": coin["dailyPercent"]
+                    "fiyat": fiyat,
+                    "degisim": degisim,
+                    "hacim": hacim,
+                    "skor": skor,
+                    "durum": durum
                 })
 
         except:
             pass
 
     return jsonify(liste)
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
