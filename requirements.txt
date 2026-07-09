@@ -3,3 +3,6 @@ flask-cors
 requests
 gunicorn
 pytz
+pandas
+numpy
+ta
