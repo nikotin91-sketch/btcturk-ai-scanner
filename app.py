@@ -42,6 +42,29 @@ def uygulama():
 def home():
     return "BTCTurk AI Scanner Aktif"
 
+@app.route("/test_api")
+def test_api():
+
+    from btcturk_api import get_klines
+
+    try:
+        data = get_klines(
+            "BTCTRY",
+            resolution=1,
+            candle_count=50
+        )
+
+        return jsonify({
+            "durum": "ok",
+            "veri": data
+        })
+
+    except Exception as e:
+        return jsonify({
+            "durum": "hata",
+            "mesaj": str(e)
+        })
+
 
 @app.route("/firsatlar")
 def firsatlar():
