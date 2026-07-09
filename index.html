@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BTCTürk AI Scanner</title>
+
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    margin:0;
+    padding:15px;
+}
+
+h2{
+    text-align:center;
+}
+
+.card{
+    background:#222;
+    padding:15px;
+    margin:10px 0;
+    border-radius:12px;
+}
+
+.al{
+    color:#00ff88;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>🚀 BTCTürk AI Scanner</h2>
+
+<div id="liste">
+Veriler yükleniyor...
+</div>
+
+
+<script>
+
+async function tara(){
+
+let cevap = await fetch("/firsatlar");
+
+let veri = await cevap.json();
+
+let alan = document.getElementById("liste");
+
+alan.innerHTML="";
+
+
+if(veri.length==0){
+
+alan.innerHTML="Şu an güçlü fırsat yok";
+
+return;
+
+}
+
+
+veri.forEach(c=>{
+
+alan.innerHTML += `
+
+<div class="card">
+
+<h3>${c.coin}</h3>
+
+Fiyat: ${c.fiyat} TL
+
+<br>
+
+24s Değişim:
+${c.degisim} %
+
+<br><br>
+
+<span class="al">
+🟢 TAKİP
+</span>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+tara();
+
+setInterval(tara,30000);
+
+
+</script>
+
+</body>
+</html>
