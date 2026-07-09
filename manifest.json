@@ -1,0 +1,9 @@
+{
+  "name": "BTCTürk AI Scanner",
+  "short_name": "AI Scanner",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "description": "BTCTürk fırsat tarayıcı"
+}
