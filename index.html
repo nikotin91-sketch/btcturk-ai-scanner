@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>BTCTürk AI Scanner</title>
 
+<link rel="manifest" href="/manifest.json">
+
 <style>
+
 body{
     background:#111;
     color:white;
@@ -18,52 +23,123 @@ h2{
 }
 
 .card{
+
     background:#222;
     padding:15px;
     margin:10px 0;
     border-radius:12px;
+
 }
 
-.al{
+
+.green{
     color:#00ff88;
     font-weight:bold;
 }
 
+
+.yellow{
+    color:#ffd000;
+    font-weight:bold;
+}
+
+
+.time{
+
+    text-align:center;
+    color:#aaa;
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <h2>🚀 BTCTürk AI Scanner</h2>
 
-<div id="liste">
-Veriler yükleniyor...
+<div class="time" id="saat">
+Tarama bekleniyor...
 </div>
+
+
+<div id="liste">
+
+Veriler yükleniyor...
+
+</div>
+
 
 
 <script>
 
+
+// Bildirim sistemi
+
+if ("serviceWorker" in navigator){
+
+    navigator.serviceWorker.register(
+        "/service-worker.js"
+    );
+
+}
+
+
+if ("Notification" in window){
+
+    Notification.requestPermission();
+
+}
+
+
+
+// Coin tarama
+
 async function tara(){
+
+
+try{
+
 
 let cevap = await fetch("/firsatlar");
 
+
 let veri = await cevap.json();
 
+
+
 let alan = document.getElementById("liste");
+
 
 alan.innerHTML="";
 
 
-if(veri.length==0){
+document.getElementById("saat").innerHTML =
+"Son tarama: " + veri.saat;
 
-alan.innerHTML="Şu an güçlü fırsat yok";
+
+
+if(veri.coinler.length==0){
+
+alan.innerHTML =
+"Şu an güçlü fırsat yok";
 
 return;
 
 }
 
 
-veri.forEach(c=>{
+
+veri.coinler.forEach(c=>{
+
+
+let renk =
+c.ai >=80 ? "green" : "yellow";
+
+
 
 alan.innerHTML += `
 
@@ -71,34 +147,67 @@ alan.innerHTML += `
 
 <h3>${c.coin}</h3>
 
-Fiyat: ${c.fiyat} TL
+Fiyat:
+${c.fiyat} TL
 
 <br>
 
-24s Değişim:
-${c.degisim} %
+24s:
+%${c.degisim}
+
+<br>
+
+Hacim:
+${c.hacim}
 
 <br><br>
 
-<span class="al">
-🟢 TAKİP
+<span class="${renk}">
+${c.sinyal}
 </span>
+
+<br>
+
+AI Skor:
+${c.ai}
 
 </div>
 
 `;
 
+
+
 });
+
+
+}
+
+catch(e){
+
+document.getElementById("liste").innerHTML =
+"Bağlantı hatası";
 
 }
 
 
+}
+
+
+
 tara();
 
-setInterval(tara,30000);
+
+// 30 saniyede bir yenile
+
+setInterval(
+    tara,
+    30000
+);
 
 
 </script>
+
+
 
 </body>
 </html>
