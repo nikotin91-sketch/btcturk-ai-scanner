@@ -47,10 +47,7 @@ def get_klines(symbol, resolution=1, candle_count=200):
 
     print(raw)
 
-    if "data" not in raw:
-        return None
-
-    candles = raw["data"]
+    return raw
 
     closes = []
     volumes = []
