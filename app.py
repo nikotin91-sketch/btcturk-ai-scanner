@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, send_file
 from flask_cors import CORS
 import requests
+from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 CORS(app)
@@ -21,46 +23,105 @@ def firsatlar():
 
     url = "https://api.btcturk.com/api/v2/ticker"
 
-    veri = requests.get(url, timeout=10).json()
+    try:
+        veri = requests.get(url, timeout=10).json()
+    except:
+        return jsonify({
+            "saat": "",
+            "coinler": []
+        })
+
 
     liste = []
 
-    for coin in veri["data"]:
+
+    for coin in veri.get("data", []):
+
         try:
+
             isim = coin["pairNormalized"]
 
             if not isim.endswith("_TRY"):
                 continue
 
+
             fiyat = float(coin["last"])
             degisim = float(coin["dailyPercent"])
             hacim = float(coin["volume"])
 
-            skor = 50
+
+            skor = 40
+
+
+            # Fiyat hareketi
+            if degisim >= 3:
+                skor += 15
 
             if degisim >= 5:
-                skor += 20
+                skor += 15
 
-            if hacim > 10:
-                skor += 20
 
-            durum = "🟢 AL" if skor >= 70 else "🟡 TAKİP"
+            # Hacim gücü
+            if hacim >= 5:
+                skor += 10
 
-            if skor >= 70:
+            if hacim >= 20:
+                skor += 10
+
+
+
+            if skor >= 80:
+                sinyal = "🟢 GÜÇLÜ AL"
+
+            elif skor >= 65:
+                sinyal = "🟡 TAKİP"
+
+            else:
+                sinyal = "⚪ BEKLE"
+
+
+
+            if skor >= 65:
+
                 liste.append({
+
                     "coin": isim,
                     "fiyat": fiyat,
-                    "degisim": degisim,
-                    "hacim": hacim,
-                    "skor": skor,
-                    "durum": durum
+                    "degisim": round(degisimi, 2) if False else round(degisism,2),
+                    "hacim": round(hacim,2),
+                    "ai": skor,
+                    "sinyal": sinyal
+
                 })
+
 
         except:
             pass
 
-    return jsonify(liste)
+
+
+    liste.sort(
+        key=lambda x: x["ai"],
+        reverse=True
+    )
+
+
+    saat = datetime.now(
+        pytz.timezone("Europe/Istanbul")
+    ).strftime("%H:%M:%S")
+
+
+    return jsonify({
+
+        "saat": saat,
+        "coinler": liste[:20]
+
+    })
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+
+    app.run(
+        host="0.0.0.0",
+        port=5000
+    )
