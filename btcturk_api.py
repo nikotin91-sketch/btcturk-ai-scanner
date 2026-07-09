@@ -45,6 +45,8 @@ def get_klines(symbol, resolution=1, candle_count=200):
 
     raw = r.json()
 
+    print(raw)
+
     if "data" not in raw:
         return None
 
