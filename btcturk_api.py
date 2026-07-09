@@ -25,7 +25,6 @@ def get_try_pairs():
 
     return pairs
 
-
 def get_klines(symbol, resolution=1, candle_count=200):
 
     now = int(time.time())
@@ -45,26 +44,15 @@ def get_klines(symbol, resolution=1, candle_count=200):
 
     raw = r.json()
 
-    print(raw)
-
-    return raw
-
-    closes = []
-    volumes = []
-
-    for candle in candles:
-
-        try:
-            closes.append(float(candle["close"]))
-            volumes.append(float(candle["volume"]))
-        except:
-            continue
-
-    if not closes:
+    if raw.get("s") != "ok":
         return None
 
     return {
-        "close": closes,
-        "volume": volumes,
-        "last_price": closes[-1]
+        "close": [float(x) for x in raw.get("c", [])],
+        "open": [float(x) for x in raw.get("o", [])],
+        "high": [float(x) for x in raw.get("h", [])],
+        "low": [float(x) for x in raw.get("l", [])],
+        "volume": [float(x) for x in raw.get("v", [])],
+        "time": raw.get("t", []),
+        "last_price": float(raw["c"][-1])
     }
