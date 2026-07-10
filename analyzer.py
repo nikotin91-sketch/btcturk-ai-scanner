@@ -2,49 +2,60 @@ from config import MIN_AI_SCORE
 
 
 def calculate_score(data):
-    """
-    data örneği:
-    {
-        "rsi": 48,
-        "ema_trend": True,
-        "macd_cross": True,
-        "volume_spike": False,
-        "price_change": 3.2,
-        "breakout": False
-    }
-    """
 
     score = 0
     reasons = []
 
-    rsi = data.get("rsi", 50)
+    rsi = data["rsi"]
 
-    if 40 <= rsi <= 60:
+    if 45 <= rsi <= 65:
         score += 20
         reasons.append("RSI")
 
-    if data.get("ema_trend", False):
-        score += 20
-        reasons.append("EMA")
+    elif 35 <= rsi < 45:
+        score += 10
 
-    if data.get("macd_cross", False):
-        score += 20
+    elif 65 < rsi <= 75:
+        score += 5
+
+
+    if data["ema9"] > data["ema21"]:
+        score += 25
+        reasons.append("EMA TREND")
+
+
+    macd = data["macd"]
+
+    if macd and macd["macd"] > macd["signal"]:
+        score += 25
         reasons.append("MACD")
 
+
     if data.get("volume_spike", False):
-        score += 20
+        score += 15
         reasons.append("HACİM")
 
+
     if data.get("breakout", False):
-        score += 20
+        score += 15
         reasons.append("BREAKOUT")
 
+
+    score = min(score, 100)
+
+
     if score >= 90:
-        signal = "🟢 GÜÇLÜ AL"
+        signal = "🚀 STRONG BUY"
+
+    elif score >= 75:
+        signal = "🟢 BUY"
+
     elif score >= MIN_AI_SCORE:
-        signal = "🟡 TAKİP"
+        signal = "🟡 WATCH"
+
     else:
-        signal = "⚪ BEKLE"
+        signal = "⚪ WAIT"
+
 
     return {
         "score": score,
