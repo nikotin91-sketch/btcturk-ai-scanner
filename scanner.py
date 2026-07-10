@@ -18,18 +18,25 @@ def scan_coin(symbol):
     if not ema9 or not ema21:
         return None
 
+
     volumes = data["volume"]
 
     avg_volume = sum(volumes[-20:]) / 20
 
     volume_now = volumes[-1]
 
+    # Son mum hacmi 0 gelirse son 5 mum ortalamasını kullan
+    if volume_now == 0:
+        volume_now = sum(volumes[-5:]) / 5
+
+
     if avg_volume > 0:
         volume_ratio = round(volume_now / avg_volume, 2)
     else:
         volume_ratio = 0
 
-    volume_spike = volume_ratio > 1.2
+
+    volume_spike = volume_ratio >= 1.2
 
 
     last_high = max(prices[-20:-1])
