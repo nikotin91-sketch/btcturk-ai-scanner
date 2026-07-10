@@ -87,7 +87,7 @@ def firsatlar():
                 if score["score"] < 40:
                     continue
 
-                if score["score"] >= 90:
+                if score["score"] >= 80:
 
                     if can_send(pair["symbol"], NOTIFICATION_COOLDOWN):
 
