@@ -95,6 +95,11 @@ def calculate_score(data):
         reasons.append("HACİM ARTIŞI")
         volume_good = True
 
+    elif volume_ratio >= 1.1:
+        score += 5
+        reasons.append("HAFİF HACİM DESTEĞİ")
+        volume_good = True
+
     elif volume_ratio < 0.5:
         score -= 20
         reasons.append("ÇOK DÜŞÜK HACİM")
@@ -110,7 +115,7 @@ def calculate_score(data):
         reasons.append("BREAKOUT")
 
     # =========================
-    # SKOR SINIRI
+    # SKOR SINIRLARI
     # =========================
 
     if score < 0:
