@@ -96,6 +96,11 @@ def firsatlar():
 
 Coin: {pair["display"]}
 Fiyat: {result["price"]}
+
+🎯 Hedef 1: {result["target1"]}
+🚀 Hedef 2: {result["target2"]}
+🛑 Stop: {result["stop"]}
+
 AI Skor: {score["score"]}
 Sinyal: {score["signal"]}
 
