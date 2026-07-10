@@ -30,6 +30,8 @@ def scan_coin(symbol):
 
     breakout = prices[-1] > last_high
 
+    breakout_strength = ((prices[-1] - last_high) / last_high) * 100
+
 
     analysis = {
         "rsi": rsi(prices),
@@ -38,7 +40,8 @@ def scan_coin(symbol):
         "macd": macd(prices),
         "volume_spike": volume_spike,
         "volume_ratio": volume_ratio,
-        "breakout": breakout
+        "breakout": breakout,
+        "breakout_strength": breakout_strength,
     }
 
     result = calculate_score(analysis)
