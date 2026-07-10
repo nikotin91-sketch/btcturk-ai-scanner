@@ -1,9 +1,7 @@
 from flask import Flask, jsonify, send_file
 from flask_cors import CORS
-import requests
 from datetime import datetime
 import pytz
-import os
 from btcturk_api import get_try_pairs
 from scanner import scan_coin
 from cache import can_send
@@ -12,30 +10,6 @@ from config import NOTIFICATION_COOLDOWN
 
 app = Flask(__name__)
 CORS(app)
-
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-
-
-def telegram_gonder(mesaj):
-
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        return
-
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-
-    try:
-        requests.post(
-            url,
-            json={
-                "chat_id": TELEGRAM_CHAT_ID,
-                "text": mesaj
-            },
-            timeout=10
-        )
-
-    except:
-        pass
 
 
 @app.route("/app")
@@ -94,46 +68,30 @@ def test_scanner():
 @app.route("/firsatlar")
 def firsatlar():
 
-    url = "https://api.btcturk.com/api/v2/ticker"
-
-    try:
-        veri = requests.get(
-            url,
-            timeout=10
-        ).json()
-
-    except:
-
-        return jsonify({
-            "saat": "",
-            "coinler": []
-        })
-
-
     liste = []
 
-    pairs = get_try_pairs()
-
-for pair in pairs:
-
     try:
+        pairs = get_try_pairs()
 
-        result = scan_coin(pair["symbol"])
+        for pair in pairs:
 
-        if result is None:
-            continue
+            try:
+                result = scan_coin(pair["symbol"])
 
-        score = result["score"]
+                if result is None:
+                    continue
 
-        if score["score"] < 60:
-            continue
+                score = result["score"]
 
-        if score["score"] >= 90:
+                if score["score"] < 60:
+                    continue
 
-    if can_send(pair["symbol"], NOTIFICATION_COOLDOWN):
+                if score["score"] >= 90:
 
-        send_telegram(
-            f"""🚀 <b>BTCTürk AI Sinyali</b>
+                    if can_send(pair["symbol"], NOTIFICATION_COOLDOWN):
+
+                        send_telegram(
+                            f"""🚀 <b>BTCTürk AI Sinyali</b>
 
 Coin: {pair["display"]}
 Fiyat: {result["price"]}
@@ -143,38 +101,38 @@ Sinyal: {score["signal"]}
 Nedenler:
 {", ".join(score["reasons"])}
 """
-        )
+                        )
 
-        liste.append({
-            "coin": pair["display"],
-            "fiyat": result["price"],
-            "ai": score["score"],
-            "sinyal": score["signal"],
-            "nedenler": score["reasons"]
-        })
+                liste.append({
+                    "coin": pair["display"],
+                    "fiyat": result["price"],
+                    "ai": score["score"],
+                    "sinyal": score["signal"],
+                    "nedenler": score["reasons"]
+                })
+
+            except Exception:
+                continue
 
     except Exception:
-        continue
-
+        return jsonify({
+            "saat": "",
+            "coinler": []
+        })
 
     liste.sort(
         key=lambda x: x["ai"],
         reverse=True
     )
 
-
     saat = datetime.now(
         pytz.timezone("Europe/Istanbul")
     ).strftime("%H:%M:%S")
 
-
     return jsonify({
-
         "saat": saat,
         "coinler": liste[:20]
-
     })
-
 
 
 if __name__ == "__main__":
