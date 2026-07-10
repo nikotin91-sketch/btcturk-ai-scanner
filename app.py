@@ -72,7 +72,7 @@ def firsatlar():
 
     try:
         pairs = get_try_pairs()
-        pairs = pairs[:10]
+        pairs = pairs[:20]
 
         for pair in pairs:
 
@@ -84,7 +84,7 @@ def firsatlar():
 
                 score = result["score"]
 
-                if score["score"] < 60:
+                if score["score"] < 30:
                     continue
 
                 if score["score"] >= 90:
