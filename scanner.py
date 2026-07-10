@@ -40,8 +40,18 @@ def scan_coin(symbol):
 
     result = calculate_score(analysis)
 
+    price = data["last_price"]
+
+    target1 = round(price * 1.02, 2)   # %2 hedef
+    target2 = round(price * 1.05, 2)   # %5 hedef
+    stop = round(price * 0.985, 2)     # %1.5 stop
+
+
     return {
-        "price": data["last_price"],
+        "price": price,
+        "target1": target1,
+        "target2": target2,
+        "stop": stop,
         "analysis": analysis,
         "score": result
     }
