@@ -78,6 +78,18 @@ def test_api():
             "hata": str(e)
         })
 
+@app.route("/test_scanner")
+def test_scanner():
+
+    result = scan_coin("BTCTRY")
+
+    if result is None:
+        return jsonify({
+            "durum": "hata"
+        })
+
+    return jsonify(result)
+
 
 @app.route("/firsatlar")
 def firsatlar():
