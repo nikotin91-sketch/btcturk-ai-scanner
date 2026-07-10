@@ -31,9 +31,16 @@ def calculate_score(data):
 
 
     # EMA Trend
-    if data["ema9"] > data["ema21"]:
+    ema9 = data["ema9"]
+    ema21 = data["ema21"]
+
+    if ema9 > ema21:
         score += 25
         reasons.append("EMA TREND")
+
+    elif ema9 > ema21 * 0.9995:
+        score += 10
+        reasons.append("EMA YAKLAŞIYOR")
 
 
     # MACD
