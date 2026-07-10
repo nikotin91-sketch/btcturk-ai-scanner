@@ -31,20 +31,28 @@ def calculate_score(data):
         reasons.append("RSI YÜKSEK")
 
 
-    # EMA
+    # EMA Trend + EMA50
     ema9 = data.get("ema9", 0)
     ema21 = data.get("ema21", 0)
+    ema50 = data.get("ema50", 0)
 
-    ema_up = False
 
     if ema9 > ema21:
         score += 25
         reasons.append("EMA TREND")
-        ema_up = True
 
     elif ema9 > ema21 * 0.9995:
         score += 10
         reasons.append("EMA YAKLAŞIYOR")
+
+
+    if ema9 > ema21 > ema50:
+        score += 15
+        reasons.append("GÜÇLÜ TREND")
+
+    elif ema9 > ema21 and ema9 < ema50:
+        score += 5
+        reasons.append("ERKEN DÖNÜŞ")
 
 
     # MACD
@@ -94,9 +102,7 @@ def calculate_score(data):
 
 
     # Breakout
-    breakout = data.get("breakout", False)
-
-    if breakout:
+    if data.get("breakout", False):
         score += 15
         reasons.append("BREAKOUT")
 
@@ -107,7 +113,7 @@ def calculate_score(data):
     score = min(score, 100)
 
 
-    # Son sinyal filtresi
+    # Sinyal
     if score >= 90 and macd_positive and volume_good:
         signal = "🚀 STRONG BUY"
 
