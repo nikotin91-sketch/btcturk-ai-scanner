@@ -1,3 +1,4 @@
+import time
 import requests
 import time
 
@@ -38,7 +39,7 @@ def get_klines(symbol, resolution=1, candle_count=200):
         f"&from={start}"
         f"&to={now}"
     )
-
+    time.sleep(0.5)
     r = requests.get(url, timeout=10)
     r.raise_for_status()
 
