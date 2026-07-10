@@ -22,15 +22,24 @@ def scan_coin(symbol):
 
     avg_volume = sum(volumes[-20:]) / 20
 
-    volume_ratio = round(volumes[-1] / avg_volume, 2) if avg_volume else 0
+    volume_now = volumes[-1]
+
+    if avg_volume > 0:
+        volume_ratio = round(volume_now / avg_volume, 2)
+    else:
+        volume_ratio = 0
 
     volume_spike = volume_ratio > 1.2
+
 
     last_high = max(prices[-20:-1])
 
     breakout = prices[-1] > last_high
 
-    breakout_strength = ((prices[-1] - last_high) / last_high) * 100
+    breakout_strength = round(
+        ((prices[-1] - last_high) / last_high) * 100,
+        2
+    )
 
 
     analysis = {
@@ -44,13 +53,15 @@ def scan_coin(symbol):
         "breakout_strength": breakout_strength,
     }
 
+
     result = calculate_score(analysis)
+
 
     price = data["last_price"]
 
-    target1 = round(price * 1.02, 2)   # %2 hedef
-    target2 = round(price * 1.05, 2)   # %5 hedef
-    stop = round(price * 0.985, 2)     # %1.5 stop
+    target1 = round(price * 1.02, 2)
+    target2 = round(price * 1.05, 2)
+    stop = round(price * 0.985, 2)
 
 
     return {
