@@ -46,7 +46,7 @@ def home():
 def test_api():
 
     from btcturk_api import get_klines
-    from indicators import ema, rsi
+    from indicators import ema, rsi, macd
 
     try:
         data = get_klines(
@@ -64,7 +64,8 @@ def test_api():
             "fiyat": prices[-1],
             "rsi": rsi(prices),
             "ema9": ema9[-1],
-            "ema21": ema21[-1]
+            "ema21": ema21[-1], 
+            "macd": macd(prices)
         })
 
     except Exception as e:
