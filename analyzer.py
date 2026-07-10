@@ -26,12 +26,8 @@ def calculate_score(data):
         score += 10
         reasons.append("RSI TOPARLANMA")
 
-    elif 65 < rsi <= 70:
-        score += 10
-        reasons.append("RSI YÜKSEK")
 
-
-    # EMA Trend + EMA50
+    # EMA Trend
     ema9 = data.get("ema9", 0)
     ema21 = data.get("ema21", 0)
     ema50 = data.get("ema50", 0)
@@ -50,10 +46,6 @@ def calculate_score(data):
         score += 15
         reasons.append("GÜÇLÜ TREND")
 
-    elif ema9 > ema21 and ema9 < ema50:
-        score += 5
-        reasons.append("ERKEN DÖNÜŞ")
-
 
     # MACD
     macd = data.get("macd")
@@ -62,29 +54,21 @@ def calculate_score(data):
 
     if macd:
 
-        macd_value = macd.get("macd", 0)
-        signal_value = macd.get("signal", 0)
-        histogram = macd.get("histogram", 0)
-
-
-        if macd_value > signal_value:
+        if macd["macd"] > macd["signal"]:
             score += 25
             reasons.append("MACD POZİTİF")
             macd_positive = True
 
-        elif histogram > 0:
+        elif macd.get("histogram", 0) > 0:
             score += 10
             reasons.append("MACD TOPARLANMA")
-
-        elif abs(macd_value - signal_value) < abs(signal_value) * 0.20:
-            score += 5
-            reasons.append("MACD YAKLAŞIYOR")
 
 
     # Hacim
     volume_ratio = data.get("volume_ratio", 0)
 
     volume_good = False
+
 
     if volume_ratio >= 1.5:
         score += 15
@@ -113,15 +97,22 @@ def calculate_score(data):
     score = min(score, 100)
 
 
-    # Sinyal
+    # Sinyal filtresi
     if score >= 90 and macd_positive and volume_good:
         signal = "🚀 STRONG BUY"
 
-    elif score >= 75 and macd_positive:
-        signal = "🟢 BUY"
+
+    elif score >= 75:
+
+        if macd_positive and volume_good:
+            signal = "🟢 BUY"
+        else:
+            signal = "🟡 WATCH"
+
 
     elif score >= MIN_AI_SCORE:
         signal = "🟡 WATCH"
+
 
     else:
         signal = "⚪ WAIT"
