@@ -22,7 +22,9 @@ def scan_coin(symbol):
 
     avg_volume = sum(volumes[-20:]) / 20
 
-    volume_spike = volumes[-1] > avg_volume * 1.5
+    volume_ratio = volumes[-1] / avg_volume
+
+    volume_spike = volume_ratio > 1.2
 
     last_high = max(prices[-20:-1])
 
@@ -35,6 +37,7 @@ def scan_coin(symbol):
         "ema21": ema21[-1],
         "macd": macd(prices),
         "volume_spike": volume_spike,
+        "volume_ratio": volume_ratio,
         "breakout": breakout
     }
 
