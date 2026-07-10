@@ -64,15 +64,11 @@ def rsi(prices, period=14):
     rs = avg_gain / avg_loss
 
     return 100 - (100 / (1 + rs))
-    def macd(prices, fast=12, slow=26, signal=9):
+
+
+def macd(prices, fast=12, slow=26, signal=9):
     """
     MACD (Moving Average Convergence Divergence)
-    Döndürür:
-    {
-        "macd": float,
-        "signal": float,
-        "histogram": float
-    }
     """
 
     if len(prices) < slow + signal:
@@ -81,7 +77,6 @@ def rsi(prices, period=14):
     ema_fast = ema(prices, fast)
     ema_slow = ema(prices, slow)
 
-    # Aynı uzunluğa getir
     offset = len(ema_fast) - len(ema_slow)
     ema_fast = ema_fast[offset:]
 
@@ -97,10 +92,9 @@ def rsi(prices, period=14):
 
     macd_value = macd_line[-1]
     signal_value = signal_line[-1]
-    histogram = macd_value - signal_value
 
     return {
         "macd": macd_value,
         "signal": signal_value,
-        "histogram": histogram
+        "histogram": macd_value - signal_value
     }
