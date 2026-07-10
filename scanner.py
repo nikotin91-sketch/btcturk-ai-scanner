@@ -22,7 +22,7 @@ def scan_coin(symbol):
 
     avg_volume = sum(volumes[-20:]) / 20
 
-    volume_ratio = volumes[-1] / avg_volume
+    volume_ratio = round(volumes[-1] / avg_volume, 2) if avg_volume else 0
 
     volume_spike = volume_ratio > 1.2
 
