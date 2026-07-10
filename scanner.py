@@ -18,13 +18,24 @@ def scan_coin(symbol):
     if not ema9 or not ema21:
         return None
 
+    volumes = data["volume"]
+
+    avg_volume = sum(volumes[-20:]) / 20
+
+    volume_spike = volumes[-1] > avg_volume * 1.5
+
+    last_high = max(prices[-20:-1])
+
+    breakout = prices[-1] > last_high
+
+
     analysis = {
         "rsi": rsi(prices),
         "ema9": ema9[-1],
         "ema21": ema21[-1],
         "macd": macd(prices),
-        "volume_spike": False,
-        "breakout": False
+        "volume_spike": volume_spike,
+        "breakout": breakout
     }
 
     result = calculate_score(analysis)
