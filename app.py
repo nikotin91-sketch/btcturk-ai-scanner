@@ -72,6 +72,7 @@ def firsatlar():
 
     try:
         pairs = get_try_pairs()
+        pairs = pairs[:10]
 
         for pair in pairs:
 
