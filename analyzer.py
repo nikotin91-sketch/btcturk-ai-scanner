@@ -67,8 +67,9 @@ def calculate_score(data):
             reasons.append("MACD YAKLAŞIYOR")
 
 
-    # Hacim
+    # HACİM FİLTRESİ
     volume_ratio = data.get("volume_ratio", 0)
+
 
     if volume_ratio >= 1.5:
         score += 15
@@ -78,6 +79,10 @@ def calculate_score(data):
         score += 10
         reasons.append("HACİM ARTIŞI")
 
+    elif volume_ratio < 0.5:
+        score -= 10
+        reasons.append("DÜŞÜK HACİM")
+
 
     # Breakout
     if data.get("breakout", False):
@@ -85,10 +90,14 @@ def calculate_score(data):
         reasons.append("BREAKOUT")
 
 
+    # Skor sınırları
+    if score < 0:
+        score = 0
+
     score = min(score, 100)
 
 
-    # Sinyal sistemi
+    # Sinyal
     if score >= 90:
         signal = "🚀 STRONG BUY"
 
