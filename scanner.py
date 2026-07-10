@@ -12,10 +12,13 @@ def scan_coin(symbol):
 
     prices = data["close"]
 
+
     ema9 = ema(prices, 9)
     ema21 = ema(prices, 21)
+    ema50 = ema(prices, 50)
 
-    if not ema9 or not ema21:
+
+    if not ema9 or not ema21 or not ema50:
         return None
 
 
@@ -25,10 +28,6 @@ def scan_coin(symbol):
 
     volume_now = volumes[-1]
 
-    # Son mum hacmi 0 gelirse son 5 mum ortalamasını kullan
-    if volume_now == 0:
-        volume_now = sum(volumes[-5:]) / 5
-
 
     if avg_volume > 0:
         volume_ratio = round(volume_now / avg_volume, 2)
@@ -36,12 +35,13 @@ def scan_coin(symbol):
         volume_ratio = 0
 
 
-    volume_spike = volume_ratio >= 1.2
+    volume_spike = volume_ratio > 1.2
 
 
     last_high = max(prices[-20:-1])
 
     breakout = prices[-1] > last_high
+
 
     breakout_strength = round(
         ((prices[-1] - last_high) / last_high) * 100,
@@ -50,14 +50,20 @@ def scan_coin(symbol):
 
 
     analysis = {
+
         "rsi": rsi(prices),
+
         "ema9": ema9[-1],
         "ema21": ema21[-1],
+        "ema50": ema50[-1],
+
         "macd": macd(prices),
+
         "volume_spike": volume_spike,
         "volume_ratio": volume_ratio,
+
         "breakout": breakout,
-        "breakout_strength": breakout_strength,
+        "breakout_strength": breakout_strength
     }
 
 
@@ -66,16 +72,21 @@ def scan_coin(symbol):
 
     price = data["last_price"]
 
+
     target1 = round(price * 1.02, 2)
     target2 = round(price * 1.05, 2)
     stop = round(price * 0.985, 2)
 
 
     return {
+
         "price": price,
+
         "target1": target1,
         "target2": target2,
         "stop": stop,
+
         "analysis": analysis,
+
         "score": result
     }
