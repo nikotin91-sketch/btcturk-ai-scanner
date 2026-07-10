@@ -89,7 +89,7 @@ def firsatlar():
 
                 if score["score"] >= 70:
 
-                    if can_send(pair["symbol"], NOTIFICATION_COOLDOWN):
+                    if True:
 
                         send_telegram(
                             f"""🚀 <b>BTCTürk AI Sinyali</b>
