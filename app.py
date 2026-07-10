@@ -112,84 +112,49 @@ def firsatlar():
 
     liste = []
 
+    pairs = get_try_pairs()
 
-    for coin in veri.get("data", []):
+for pair in pairs:
 
-        try:
+    try:
 
-            isim = coin["pairNormalized"]
+        result = scan_coin(pair["symbol"])
 
-            if not isim.endswith("_TRY"):
-                continue
-
-
-            fiyat = float(coin["last"])
-            degisim = float(coin["dailyPercent"])
-            hacim = float(coin["volume"])
-
-
-            skor = 40
-
-
-            if degisim >= 2:
-                skor += 10
-
-            if degisim >= 5:
-                skor += 20
-
-
-            if hacim >= 5:
-                skor += 10
-
-            if hacim >= 20:
-                skor += 10
-
-
-
-            if skor >= 80:
-
-                sinyal = "🟢 GÜÇLÜ AL"
-
-
-                telegram_gonder(
-                    f"🚀 BTCTürk AI Sinyal\n\n"
-                    f"Coin: {isim}\n"
-                    f"Fiyat: {fiyat} TL\n"
-                    f"Değişim: %{degisim}\n"
-                    f"Hacim: {hacim}\n"
-                    f"AI Skor: {skor}"
-                )
-
-
-            elif skor >= 60:
-
-                sinyal = "🟡 TAKİP"
-
-
-            else:
-
-                sinyal = "⚪ BEKLE"
-
-
-
-            if skor >= 60:
-
-                liste.append({
-
-                    "coin": isim,
-                    "fiyat": fiyat,
-                    "degisim": round(degisim, 2),
-                    "hacim": round(hacim, 2),
-                    "ai": skor,
-                    "sinyal": sinyal
-
-                })
-
-
-        except:
-
+        if result is None:
             continue
 
+        score = result["score"]
+
+        if score["score"] < 60:
+            continue
+
+        if score["score"] >= 90:
+
+    if can_send(pair["symbol"], NOTIFICATION_COOLDOWN):
+
+        send_telegram(
+            f"""🚀 <b>BTCTürk AI Sinyali</b>
+
+Coin: {pair["display"]}
+Fiyat: {result["price"]}
+AI Skor: {score["score"]}
+Sinyal: {score["signal"]}
+
+Nedenler:
+{", ".join(score["reasons"])}
+"""
+        )
+
+        liste.append({
+            "coin": pair["display"],
+            "fiyat": result["price"],
+            "ai": score["score"],
+            "sinyal": score["signal"],
+            "nedenler": score["reasons"]
+        })
+
+    except Exception:
+        continue
 
 
     liste.sort(
