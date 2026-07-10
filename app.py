@@ -84,7 +84,7 @@ def firsatlar():
 
                 score = result["score"]
 
-                if score["score"] < 30:
+                if score["score"] < 40:
                     continue
 
                 if score["score"] >= 90:
