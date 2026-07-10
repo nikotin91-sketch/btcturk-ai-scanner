@@ -12,10 +12,8 @@ def calculate_score(data):
             "reasons": ["YETERSİZ VERİ"]
         }
 
-
     score = 0
     reasons = []
-
 
     # RSI
     if 50 <= rsi <= 65:
@@ -26,12 +24,10 @@ def calculate_score(data):
         score += 10
         reasons.append("RSI TOPARLANMA")
 
-
     # EMA Trend
     ema9 = data.get("ema9", 0)
     ema21 = data.get("ema21", 0)
     ema50 = data.get("ema50", 0)
-
 
     if ema9 > ema21:
         score += 25
@@ -41,15 +37,12 @@ def calculate_score(data):
         score += 10
         reasons.append("EMA YAKLAŞIYOR")
 
-
     if ema9 > ema21 > ema50:
         score += 15
         reasons.append("GÜÇLÜ TREND")
 
-
     # MACD
     macd = data.get("macd")
-
     macd_positive = False
 
     if macd:
@@ -63,12 +56,9 @@ def calculate_score(data):
             score += 10
             reasons.append("MACD TOPARLANMA")
 
-
     # Hacim
     volume_ratio = data.get("volume_ratio", 0)
-
     volume_good = False
-
 
     if volume_ratio >= 1.5:
         score += 15
@@ -84,39 +74,39 @@ def calculate_score(data):
         score -= 10
         reasons.append("DÜŞÜK HACİM")
 
-
     # Breakout
-    if data.get("breakout", False):
+    breakout = data.get("breakout", False)
+
+    if breakout:
         score += 15
         reasons.append("BREAKOUT")
-
 
     if score < 0:
         score = 0
 
     score = min(score, 100)
 
-
-    # Sinyal filtresi
-    if score >= 90 and macd_positive and volume_good:
+    # Sinyal Filtresi
+    if (
+        score >= 90
+        and macd_positive
+        and volume_good
+        and breakout
+    ):
         signal = "🚀 STRONG BUY"
 
+    elif score >= 80:
 
-    elif score >= 75:
-
-        if macd_positive and volume_good:
+        if macd_positive:
             signal = "🟢 BUY"
         else:
             signal = "🟡 WATCH"
 
-
     elif score >= MIN_AI_SCORE:
         signal = "🟡 WATCH"
 
-
     else:
         signal = "⚪ WAIT"
-
 
     return {
         "score": score,
