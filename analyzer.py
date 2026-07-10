@@ -40,9 +40,14 @@ def calculate_score(data):
     macd = data.get("macd")
 
     if macd:
+
         if macd["macd"] > macd["signal"]:
             score += 25
             reasons.append("MACD POZİTİF")
+
+        elif macd.get("histogram", 0) > 0:
+            score += 10
+            reasons.append("MACD TOPARLANMA")
 
 
     # Hacim
