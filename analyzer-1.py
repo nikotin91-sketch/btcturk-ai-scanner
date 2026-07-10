@@ -1,4 +1,4 @@
-from config import MIN_AI_SCORE
+from config import MIN_AI_SCORE.
 
 def calculate_score(data):
     rsi = data.get("rsi")
