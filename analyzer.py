@@ -12,6 +12,7 @@ def calculate_score(data):
             "reasons": ["YETERSİZ VERİ"]
         }
 
+
     score = 0
     reasons = []
 
@@ -31,8 +32,8 @@ def calculate_score(data):
 
 
     # EMA Trend
-    ema9 = data["ema9"]
-    ema21 = data["ema21"]
+    ema9 = data.get("ema9", 0)
+    ema21 = data.get("ema21", 0)
 
     if ema9 > ema21:
         score += 25
@@ -48,13 +49,22 @@ def calculate_score(data):
 
     if macd:
 
-        if macd["macd"] > macd["signal"]:
+        macd_value = macd.get("macd", 0)
+        signal_value = macd.get("signal", 0)
+        histogram = macd.get("histogram", 0)
+
+
+        if macd_value > signal_value:
             score += 25
             reasons.append("MACD POZİTİF")
 
-        elif macd.get("histogram", 0) > 0:
+        elif histogram > 0:
             score += 10
             reasons.append("MACD TOPARLANMA")
+
+        elif abs(macd_value - signal_value) < abs(signal_value) * 0.20:
+            score += 5
+            reasons.append("MACD YAKLAŞIYOR")
 
 
     # Hacim
@@ -78,13 +88,16 @@ def calculate_score(data):
     score = min(score, 100)
 
 
-    # Sinyal
+    # Sinyal sistemi
     if score >= 90:
         signal = "🚀 STRONG BUY"
 
     elif score >= 75:
 
-        if data.get("volume_spike", False) or data.get("breakout_strength", 0) >= 0.10:
+        if (
+            data.get("volume_spike", False)
+            or data.get("breakout_strength", 0) >= 0.10
+        ):
             signal = "🟢 BUY"
         else:
             signal = "🟡 WATCH"
