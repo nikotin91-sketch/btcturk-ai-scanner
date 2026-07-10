@@ -15,7 +15,10 @@ def calculate_score(data):
     score = 0
     reasons = []
 
+    # =========================
     # RSI
+    # =========================
+
     if 50 <= rsi <= 65:
         score += 20
         reasons.append("RSI GÜÇLÜ")
@@ -24,7 +27,18 @@ def calculate_score(data):
         score += 10
         reasons.append("RSI TOPARLANMA")
 
-    # EMA Trend
+    elif rsi > 70:
+        score -= 10
+        reasons.append("RSI AŞIRI ALIM")
+
+    elif rsi < 35:
+        score -= 10
+        reasons.append("RSI ZAYIF")
+
+    # =========================
+    # EMA
+    # =========================
+
     ema9 = data.get("ema9", 0)
     ema21 = data.get("ema21", 0)
     ema50 = data.get("ema50", 0)
@@ -41,7 +55,10 @@ def calculate_score(data):
         score += 15
         reasons.append("GÜÇLÜ TREND")
 
+    # =========================
     # MACD
+    # =========================
+
     macd = data.get("macd")
     macd_positive = False
 
@@ -56,11 +73,19 @@ def calculate_score(data):
             score += 10
             reasons.append("MACD TOPARLANMA")
 
-    # Hacim
+    # =========================
+    # HACİM
+    # =========================
+
     volume_ratio = data.get("volume_ratio", 0)
     volume_good = False
 
-    if volume_ratio >= 1.5:
+    if volume_ratio >= 2.0:
+        score += 20
+        reasons.append("ÇOK GÜÇLÜ HACİM")
+        volume_good = True
+
+    elif volume_ratio >= 1.5:
         score += 15
         reasons.append("GÜÇLÜ HACİM")
         volume_good = True
@@ -71,22 +96,33 @@ def calculate_score(data):
         volume_good = True
 
     elif volume_ratio < 0.5:
-        score -= 10
-        reasons.append("DÜŞÜK HACİM")
+        score -= 20
+        reasons.append("ÇOK DÜŞÜK HACİM")
 
-    # Breakout
+    # =========================
+    # BREAKOUT
+    # =========================
+
     breakout = data.get("breakout", False)
 
     if breakout:
         score += 15
         reasons.append("BREAKOUT")
 
+    # =========================
+    # SKOR SINIRI
+    # =========================
+
     if score < 0:
         score = 0
 
-    score = min(score, 100)
+    if score > 100:
+        score = 100
 
-    # Sinyal Filtresi
+    # =========================
+    # SİNYAL
+    # =========================
+
     if (
         score >= 90
         and macd_positive
@@ -96,11 +132,7 @@ def calculate_score(data):
         signal = "🚀 STRONG BUY"
 
     elif score >= 80:
-
-        if macd_positive:
-            signal = "🟢 BUY"
-        else:
-            signal = "🟡 WATCH"
+        signal = "🟢 BUY"
 
     elif score >= MIN_AI_SCORE:
         signal = "🟡 WATCH"
