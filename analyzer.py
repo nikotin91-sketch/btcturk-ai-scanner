@@ -58,8 +58,14 @@ def calculate_score(data):
 
 
     # Hacim
-    if data.get("volume_spike", False):
+    volume_ratio = data.get("volume_ratio", 0)
+
+    if volume_ratio >= 1.5:
         score += 15
+        reasons.append("GÜÇLÜ HACİM")
+
+    elif volume_ratio >= 1.2:
+        score += 10
         reasons.append("HACİM ARTIŞI")
 
 
