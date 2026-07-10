@@ -31,13 +31,16 @@ def calculate_score(data):
         reasons.append("RSI YÜKSEK")
 
 
-    # EMA Trend
+    # EMA
     ema9 = data.get("ema9", 0)
     ema21 = data.get("ema21", 0)
+
+    ema_up = False
 
     if ema9 > ema21:
         score += 25
         reasons.append("EMA TREND")
+        ema_up = True
 
     elif ema9 > ema21 * 0.9995:
         score += 10
@@ -46,6 +49,8 @@ def calculate_score(data):
 
     # MACD
     macd = data.get("macd")
+
+    macd_positive = False
 
     if macd:
 
@@ -57,6 +62,7 @@ def calculate_score(data):
         if macd_value > signal_value:
             score += 25
             reasons.append("MACD POZİTİF")
+            macd_positive = True
 
         elif histogram > 0:
             score += 10
@@ -67,17 +73,20 @@ def calculate_score(data):
             reasons.append("MACD YAKLAŞIYOR")
 
 
-    # HACİM FİLTRESİ
+    # Hacim
     volume_ratio = data.get("volume_ratio", 0)
 
+    volume_good = False
 
     if volume_ratio >= 1.5:
         score += 15
         reasons.append("GÜÇLÜ HACİM")
+        volume_good = True
 
     elif volume_ratio >= 1.2:
         score += 10
         reasons.append("HACİM ARTIŞI")
+        volume_good = True
 
     elif volume_ratio < 0.5:
         score -= 10
@@ -85,31 +94,25 @@ def calculate_score(data):
 
 
     # Breakout
-    if data.get("breakout", False):
+    breakout = data.get("breakout", False)
+
+    if breakout:
         score += 15
         reasons.append("BREAKOUT")
 
 
-    # Skor sınırları
     if score < 0:
         score = 0
 
     score = min(score, 100)
 
 
-    # Sinyal
-    if score >= 90:
+    # Son sinyal filtresi
+    if score >= 90 and macd_positive and volume_good:
         signal = "🚀 STRONG BUY"
 
-    elif score >= 75:
-
-        if (
-            data.get("volume_spike", False)
-            or data.get("breakout_strength", 0) >= 0.10
-        ):
-            signal = "🟢 BUY"
-        else:
-            signal = "🟡 WATCH"
+    elif score >= 75 and macd_positive:
+        signal = "🟢 BUY"
 
     elif score >= MIN_AI_SCORE:
         signal = "🟡 WATCH"
