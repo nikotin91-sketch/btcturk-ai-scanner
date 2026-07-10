@@ -78,11 +78,16 @@ def calculate_score(data):
     score = min(score, 100)
 
 
+    # Sinyal
     if score >= 90:
         signal = "🚀 STRONG BUY"
 
     elif score >= 75:
-        signal = "🟢 BUY"
+
+        if data.get("volume_spike", False) or data.get("breakout_strength", 0) >= 0.10:
+            signal = "🟢 BUY"
+        else:
+            signal = "🟡 WATCH"
 
     elif score >= MIN_AI_SCORE:
         signal = "🟡 WATCH"
