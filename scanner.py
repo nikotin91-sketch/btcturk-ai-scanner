@@ -28,6 +28,9 @@ def scan_coin(symbol):
         return None
 
     volumes = data["volume"]
+    print("SON HACİM:", volumes[-1])
+    print("ORT HACİM:", sum(volumes[-20:]) / 20)
+    print("TÜM HACİMLER:", volumes[-5:])
 
     avg_volume = sum(volumes[-20:]) / 20
     volume_now = volumes[-1]
