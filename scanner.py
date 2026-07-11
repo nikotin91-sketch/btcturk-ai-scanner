@@ -29,7 +29,10 @@ def scan_coin(symbol):
     volume_ratio = round(volume_now / avg_volume, 2) if avg_volume else 0
 
     breakout = close[-1] > max(close[-20:-1])
-    breakout_strength = round(((close[-1]-max(close[-20:-1]))/max(close[-20:-1]))*100,2)
+    breakout_strength = round(
+        ((close[-1] - max(close[-20:-1])) / max(close[-20:-1])) * 100,
+        2
+    )
 
     trend_strength = 0
     if ema9[-1] > ema21[-1]:
@@ -39,8 +42,9 @@ def scan_coin(symbol):
     if volume_ratio >= 1.2:
         trend_strength += 1
 
-    risk = atr_value * 1.5
-    reward = atr_value * 2
+    # Güncellendi
+    risk = atr_value * 1.2
+    reward = atr_value * 3
     risk_reward = round(reward / risk, 2) if risk else 0
 
     analysis = {
@@ -63,10 +67,10 @@ def scan_coin(symbol):
 
     return {
         "price": price,
-        "atr": round(atr_value,2),
-        "stop": round(price-risk,2),
-        "target1": round(price+reward,2),
-        "target2": round(price+reward*2,2),
+        "atr": round(atr_value, 2),
+        "stop": round(price - risk, 2),
+        "target1": round(price + reward, 2),
+        "target2": round(price + reward * 2, 2),
         "analysis": analysis,
         "score": result
     }
