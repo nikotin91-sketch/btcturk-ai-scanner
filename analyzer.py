@@ -89,26 +89,27 @@ def calculate_score(data):
     elif vr < 0.05:
         score -= 5
         reasons.append("DÜŞÜK HACİM")
+        
 
     # BREAKOUT
-if data.get("breakout", False):
+    if data.get("breakout", False):
 
-    strength = data.get("breakout_strength", 0)
+        strength = data.get("breakout_strength", 0)
 
-    if strength >= 1.0:
-        score += 25
-        reasons.append("GÜÇLÜ BREAKOUT")
+        if strength >= 1.0:
+            score += 25
+            reasons.append("GÜÇLÜ BREAKOUT")
 
-    elif strength >= 0.50:
-        score += 20
-        reasons.append("BREAKOUT")
+        elif strength >= 0.50:
+            score += 20
+            reasons.append("BREAKOUT")
 
-    elif strength > 0:
-        score += 10
-        reasons.append("ZAYIF BREAKOUT")
+        elif strength > 0:
+            score += 10
+            reasons.append("ZAYIF BREAKOUT")
 
-else:
-    reasons.append("BREAKOUT YOK")
+    else:
+        reasons.append("BREAKOUT YOK")
 
     # ÜST TF
     if data.get("higher_tf_up", False):
